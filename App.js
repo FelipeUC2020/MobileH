@@ -76,7 +76,7 @@ export default function App() {
   const deviceTheme = useColorScheme();
   const [isDarkTheme, setIsDarkTheme] = React.useState(deviceTheme === 'dark');
 
-  const theme = isDarkTheme ? DarkTheme : DefaultTheme;
+  const theme = !isDarkTheme ? DarkTheme : DefaultTheme;
 
   const toggleTheme = () => {
     setIsDarkTheme((prevTheme) => !prevTheme);

@@ -11,31 +11,6 @@ export default function App() {
     const [taskInput, setTaskInput] = useState("");
     const swipeableRefs = useRef([]);
 
-    // para el fetch 
-    const [page, setPage] = useState(19);
-    const [data, setData] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-
-    useEffect(() => {
-      const fetchData = async () => {
-        try {
-          const response = await fetch(`https://rickandmortyapi.com/api/character/?page=${page}`);
-          if (!response.ok) {
-            console.log("error")
-          }
-          const json = await response.json();
-          setData(json);
-        } catch (error) {
-          setError(error.message);
-        } finally {
-          setLoading(false);
-        }
-      };
-      fetchData();
-
-    }, []);
-
     function handleHabitDeletion(index) {
         setTasks((prev) => {
           let newtasks=[...prev]
