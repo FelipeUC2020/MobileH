@@ -1,40 +1,17 @@
 import { SafeAreaView, ScrollView, StyleSheet, Text, View, Keyboard } from 'react-native';
 import HabitCard from '../../components/HabitCard';
 import { useState, useEffect, useRef } from 'react';
-import { TextInput, Button } from 'react-native-paper';
+import { TextInput, Button, useTheme } from 'react-native-paper';
 import { Swipeable, TouchableOpacity } from 'react-native-gesture-handler';
+import DraggableFlatList from 'react-native-draggable-flatlist';
 
-export default function App() {
+export default function TaskPage() {
+    const theme = useTheme();
     const [time, setTime] = useState(0);
     const [tasks, setTasks] = useState(["Hábito 1", "Hábito 2", "Hábito 3", "Hábito 4", 
     "Hábito 5", "Hábito 6", "Hábito 7", "Hábito 8", "Hábito 9", "Hábito 10", "Hábito 11"])
     const [taskInput, setTaskInput] = useState("");
     const swipeableRefs = useRef([]);
-
-    // para el fetch 
-    const [page, setPage] = useState(19);
-    const [data, setData] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-
-    useEffect(() => {
-      const fetchData = async () => {
-        try {
-          const response = await fetch(`https://rickandmortyapi.com/api/character/?page=${page}`);
-          if (!response.ok) {
-            console.log("error")
-          }
-          const json = await response.json();
-          setData(json);
-        } catch (error) {
-          setError(error.message);
-        } finally {
-          setLoading(false);
-        }
-      };
-      fetchData();
-
-    }, []);
 
     function handleHabitDeletion(index) {
         setTasks((prev) => {
@@ -66,11 +43,29 @@ export default function App() {
 
     const renderRightActions = (index) => (
       <TouchableOpacity
-        style={styles.deleteButton}
+        style={[styles.deleteButton, { backgroundColor: theme.colors.error }]}
         onPress={() => handleHabitDeletion(index)}
       >
         <Text style={styles.deleteButtonText}>Eliminar</Text>
       </TouchableOpacity>
+    );
+
+    const renderItem = ({ item, drag, isActive, index }) => (
+        <Swipeable
+            renderRightActions={() => renderRightActions(index)}
+            key={item.key}
+        >
+            <View
+                style={[
+                    styles.cardContainer,
+                    isActive && styles.activeCard,
+                ]}
+            >
+                <TouchableOpacity onLongPress={drag}>
+                    <HabitCard name={item.label} />
+                </TouchableOpacity>
+            </View>
+        </Swipeable>
     );
 
     useEffect(() => {
@@ -80,37 +75,34 @@ export default function App() {
 
 
     return (
-      <SafeAreaView style={styles.container}>
-        <Text style={styles.title}> Cantidad de tiempo que ha transcurrido: {time}</Text>
+      <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
+        <Text style={[styles.title, { color: theme.colors.text }]}>
+        Cantidad de tiempo que ha transcurrido: {time}
+        </Text>
         <View style={styles.inputView}>
           <TextInput 
-            style={{height: 50, width: 200}}
+            style={[{height: 50, width: 200}, { backgroundColor: theme.colors.surface }]}
             label="Task"
             value={taskInput}
             onChangeText={text => setTaskInput(text)}
+            theme={{ colors: { 
+              text: theme.colors.text, 
+              placeholder: theme.colors.placeholder, 
+              primary: theme.colors.primary 
+              } 
+            }}
           />
-          <Button onPress={() => {handleHabitCreate(taskInput)}} style={{ backgroundColor: 'purple', justifyContent: 'center' }} color={'white'}>
-            Crear
+          <Button mode="contained" onPress={() => {handleHabitCreate(taskInput)}}>
+          Crear
           </Button>
         </View>
-        <ScrollView style={{'height': 600}}>
-          <View style={styles.taskView}>
-            {tasks.map((task, index) => (
-              <Swipeable
-                renderRightActions={() => renderRightActions(index)}
-                onSwipeableOpen={() => handleHabitDeletion(index)}
-                ref={(ref) => (swipeableRefs.current[index] = ref)}
-                key={index}
-              >
-                <HabitCard name={task} onDelete={() => handleHabitDeletion(index)} />
-              </Swipeable>
-            ))}
-          </View>
-        </ScrollView>
-
-        {/*<Text>
-          {data ? JSON.stringify(data) : "Loading..."}
-        </Text>*/}
+        <DraggableFlatList
+                data={tasks}
+                keyExtractor={(item) => item.key}
+                renderItem={renderItem}
+                onDragEnd={({ data }) => setTasks(data)}
+                contentContainerStyle={styles.taskView}
+            />
       </SafeAreaView>
     );
 }
@@ -134,7 +126,9 @@ const styles = StyleSheet.create({
       paddingVertical: 10,
       paddingHorizontal: 20,
       flexDirection: 'row',
-      gap: 10
+      gap: 10,
+      alignItems: 'center',
+      justifyContent: 'center',
     },
     taskView : {
       paddingHorizontal: 10
@@ -151,6 +145,16 @@ const styles = StyleSheet.create({
     deleteButtonText: {
       color: 'white',
       fontWeight: 'bold',
+    },
+    cardContainer: {
+        backgroundColor: '#fff',
+        borderRadius: 8,
+        padding: 10,
+        marginBottom: 10,
+        elevation: 2,
+    },
+    activeCard: {
+        backgroundColor: '#e0e0e0',
     },
 });
 
