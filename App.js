@@ -8,7 +8,6 @@ import {
 } from 'react-native-paper';
 import { NavigationContainer, DarkTheme as NavDarkTheme, DefaultTheme as NavDefaultTheme } from '@react-navigation/native';
 
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import {useColorScheme} from 'react-native';
 
@@ -88,7 +87,6 @@ export default function App() {
   };
   
   return (
-    <GestureHandlerRootView>
       <PaperProvider theme={theme}>
         <NavigationContainer theme={theme}>
           <Stack.Navigator>
@@ -101,6 +99,5 @@ export default function App() {
           </Stack.Navigator>
         </NavigationContainer>
       </PaperProvider>
-    </GestureHandlerRootView>
   );
 }

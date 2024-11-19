@@ -12,13 +12,6 @@ export default function LandingPage({ name }) {
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <Text style={[styles.title, { color: theme.colors.primary }]}>Hola {name}</Text>
-      <Button
-        mode="contained"
-        onPress={() => navigation.navigate('OtraScreen')} 
-        style={styles.button}
-      >
-        Ir a Otra Ventana
-      </Button>
     </View>
   );
 }

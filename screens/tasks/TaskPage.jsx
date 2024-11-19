@@ -3,7 +3,7 @@ import HabitCard from '../../components/HabitCard';
 import { useState, useEffect, useRef } from 'react';
 import { TextInput, Button, useTheme } from 'react-native-paper';
 import { Swipeable, TouchableOpacity } from 'react-native-gesture-handler';
-import DraggableFlatList from 'react-native-draggable-flatlist';
+
 
 export default function TaskPage() {
     const theme = useTheme();
@@ -96,13 +96,20 @@ export default function TaskPage() {
           Crear
           </Button>
         </View>
-        <DraggableFlatList
-                data={tasks}
-                keyExtractor={(item) => item.key}
-                renderItem={renderItem}
-                onDragEnd={({ data }) => setTasks(data)}
-                contentContainerStyle={styles.taskView}
-            />
+        <ScrollView style={{'height': 600}}>
+          <View style={styles.taskView}>
+            {tasks.map((task, index) => (
+              <Swipeable
+                renderRightActions={() => renderRightActions(index)}
+                onSwipeableOpen={() => handleHabitDeletion(index)}
+                ref={(ref) => (swipeableRefs.current[index] = ref)}
+                key={index}
+              >
+                <HabitCard name={task} onDelete={() => handleHabitDeletion(index)} />
+              </Swipeable>
+            ))}
+          </View>
+        </ScrollView>
       </SafeAreaView>
     );
 }
