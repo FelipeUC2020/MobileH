@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { View, Text, Button, TextInput, Alert, StyleSheet } from 'react-native';
+import { View, Text, TextInput, Alert, StyleSheet } from 'react-native';
+import { Button, useTheme } from 'react-native-paper';
 
-export default function HomePage({ navigation }) {
+export default function HomePage({ navigation, toggleTheme }) {
   const [name, setName] = useState('');
+  const theme = useTheme();
 
   const handleStart = () => {
     if (name.trim() === '') {
@@ -13,15 +15,21 @@ export default function HomePage({ navigation }) {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Hola</Text>
+    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <Text style={[styles.title, { color: theme.colors.primary }]}>Hola</Text>
       <TextInput
-        style={styles.input}
+        style={[styles.input, { color: theme.colors.text, borderColor: theme.colors.placeholder }]}
         placeholder="Ingresa tu nombre"
+        placeholderTextColor={theme.colors.placeholder}
         value={name}
         onChangeText={setName}
       />
-      <Button title="Iniciar" onPress={handleStart} />
+      <Button mode="contained" onPress={handleStart} style={styles.button}>
+        Iniciar
+      </Button>
+      <Button mode="outlined" onPress={toggleTheme} style={styles.button}>
+        Cambiar Tema
+      </Button>
     </View>
   );
 }
@@ -43,5 +51,8 @@ const styles = StyleSheet.create({
     padding: 8,
     width: '80%',
     marginBottom: 16,
+  },
+  button: {
+    marginTop: 8,
   },
 });

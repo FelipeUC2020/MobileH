@@ -1,12 +1,16 @@
 import * as React from 'react';
 
 import {
-  DarkTheme,
-  DefaultTheme,
-  NavigationContainer,
-} from '@react-navigation/native';
+  DarkTheme as PaperDarkTheme,
+  DefaultTheme as PaperDefaultTheme,
+  Provider as PaperProvider,
+  Button
+} from 'react-native-paper';
+import { NavigationContainer, DarkTheme as NavDarkTheme, DefaultTheme as NavDefaultTheme } from '@react-navigation/native';
 
-import { Button, useColorScheme } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+
+import {useColorScheme} from 'react-native';
 
 import HomePage from './screens/home/HomePage.jsx'
 import LandingPage from './screens/landing_page/LandingPage.jsx'
@@ -21,7 +25,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
-function AppTabs({ route }) {
+function AppTabs({ route, toggleTheme }) {
   const {name} = route.params;
   
   return (
@@ -61,13 +65,14 @@ function AppTabs({ route }) {
       <Tab.Screen
         name="TaskPage"
         component={TaskPage}
-        options={{ title: 'Tasks' }}
+        options={{ title: `Tasks de ${name}` }}
       />
     <Tab.Screen
         name="ConfigPage"
-        component={ConfigPage}
         options={{ title: 'Configuración' }}
-      />
+      >
+      {() => <ConfigPage toggleTheme={toggleTheme} />}
+      </Tab.Screen>
     </Tab.Navigator>
   );
 }
@@ -76,27 +81,26 @@ export default function App() {
   const deviceTheme = useColorScheme();
   const [isDarkTheme, setIsDarkTheme] = React.useState(deviceTheme === 'dark');
 
-  const theme = isDarkTheme ? DarkTheme : DefaultTheme;
+  const theme = isDarkTheme ? { ...PaperDarkTheme, ...NavDarkTheme } : { ...PaperDefaultTheme, ...NavDefaultTheme };
 
   const toggleTheme = () => {
-    setIsDarkTheme((prevTheme) => !prevTheme);
+    setIsDarkTheme(!isDarkTheme);
   };
   
   return (
-    <NavigationContainer theme={theme}>
-      <Stack.Navigator>
-        <Stack.Screen
-          name="Home"
-          component={HomePage}
-          options={{
-            title: 'Bienvenido',
-            headerRight: () => (
-              <Button onPress={toggleTheme} title="Cambiar Tema" color="#007AFF" />
-            ),
-          }}
-        />
-        <Stack.Screen name="Landing" component={AppTabs} options={{ headerShown: false }} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <GestureHandlerRootView>
+      <PaperProvider theme={theme}>
+        <NavigationContainer theme={theme}>
+          <Stack.Navigator>
+            <Stack.Screen name="Home" options={{ title: 'Bienvenido' }}>
+              {(props) => <HomePage {...props} toggleTheme={toggleTheme} />}
+            </Stack.Screen>
+            <Stack.Screen name="Landing" options={{ headerShown: false }}>
+              {(props) => <AppTabs {...props} toggleTheme={toggleTheme} />}
+            </Stack.Screen>
+          </Stack.Navigator>
+        </NavigationContainer>
+      </PaperProvider>
+    </GestureHandlerRootView>
   );
 }
